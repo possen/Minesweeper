@@ -6,22 +6,6 @@
 //  Copyright © 2020 Paul Ossenbruggen. All rights reserved.
 //
 
-//
-// NOTE: this was developed in Xcode, it has some problems displaying correctly in the terminal, but looks good
-// in xcode, see the description function to add a space, but even with this it does not look great in terminal.
-// so I recommand running it in Xcode.
-//
-
-import Foundation
-
-//
-//  MinesweeperModel.swift
-//  Minesweeper
-//
-//  Created by Paul Ossenbruggen on 6/7/20.
-//  Copyright © 2020 Paul Ossenbruggen. All rights reserved.
-//
-
 import Foundation
 
 class Board: CustomStringConvertible {
