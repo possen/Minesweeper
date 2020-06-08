@@ -15,7 +15,6 @@
 		D554E165248D827F00A1CD65 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D554E163248D827F00A1CD65 /* LaunchScreen.storyboard */; };
 		D554E16B248D861300A1CD65 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D554E16A248D861300A1CD65 /* main.swift */; };
 		D554E16E248D867600A1CD65 /* MinesweeperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D554E16D248D867600A1CD65 /* MinesweeperModel.swift */; };
-		D554E16F248D86AF00A1CD65 /* MinesweeperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D554E16D248D867600A1CD65 /* MinesweeperModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -200,7 +199,6 @@
 				D554E15D248D827E00A1CD65 /* ViewController.swift in Sources */,
 				D554E159248D827E00A1CD65 /* AppDelegate.swift in Sources */,
 				D554E15B248D827E00A1CD65 /* SceneDelegate.swift in Sources */,
-				D554E16F248D86AF00A1CD65 /* MinesweeperModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
