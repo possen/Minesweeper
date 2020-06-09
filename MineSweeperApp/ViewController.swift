@@ -148,7 +148,7 @@ class Box: UILabel {
         tapGesture.require(toFail: longPress)
         self.addGestureRecognizer(longPress)
         self.addGestureRecognizer(tapGesture)
-//        self.font = UIFont.systemFont(ofSize: 35)
+        self.font = UIFont.systemFont(ofSize: 35)
         self.text = value
         self.lineBreakMode = .byClipping
     }

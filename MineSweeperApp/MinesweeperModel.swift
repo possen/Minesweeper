@@ -98,21 +98,18 @@ class Board: CustomStringConvertible {
         pieces[offset(x, y)] = piece
     }
 
-    // if running in terminal add space after modified.rawValue, double wide chars look terrible in terminal
-    //, and much better in xcode
     var description: String {
-        var str = ""
-        (0..<dimensions.1).forEach { y in
-            (0..<dimensions.0).forEach { x in
+        let str = (0..<dimensions.1).reduce(into: "") { strout, y in
+            strout += (0..<dimensions.0).reduce(into: "") { strin, x in
                 guard let val = piece(x: x, y: y) else {
                     return
                 }
                 let modified = (!cheat && val == .hidden)
                     ? .covered
                     : val
-                str += modified.rawValue
+                strin += modified.rawValue
             }
-            str += "\n"
+            strout += "\n"
         }
         return str
     }
@@ -211,6 +208,7 @@ struct Game {
     func reveal(x: Int, y: Int) throws {
         let coords = try solved.revealCoodinates(x: x, y: y)
         coords.forEach { x, y in board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y) ?? .empty) }
+        print(board.description)
     }
     
     func mark(x: Int, y: Int) throws {
