@@ -147,7 +147,7 @@ class Board: CustomStringConvertible {
         0..<dimensions.0 ~= x && 0..<dimensions.1 ~= y
     }
     
-    fileprivate func countFill(x: Int, y: Int) -> Int {
+    fileprivate func countNeighbors(x: Int, y: Int) -> Int {
         return [(x+1, y), (x-1, y), (x, y+1), (x, y-1), (x+1, y+1), (x-1, y+1), (x+1, y-1), (x-1, y-1)].reduce(0) {
           $0 + (piece(x: $1.0, y: $1.1) == .hidden ? 1 : 0)
         }
@@ -200,7 +200,7 @@ struct Game {
         board.visit { x, y in
             let value = solved.piece(x: x, y: y)
             if value != .hidden {
-                solved.setPiece(x: x, y: y, piece: solved.pieceForCount(solved.countFill(x: x, y: y)))
+                solved.setPiece(x: x, y: y, piece: solved.pieceForCount(solved.countNeighbors(x: x, y: y)))
             }
         }
     }
