@@ -80,6 +80,7 @@ class ViewController: UIViewController {
                 } else {
                     try game.mark(x: column, y: row)
                     if game.checkWin() {
+                        self.setupGrid(rows: board.dimensions.1, columns: board.dimensions.0)
                         self.displayAlert(message: "You Win!")
                         self.game = nil
                         self.askNewGame()

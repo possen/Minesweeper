@@ -25,20 +25,20 @@ class Board: CustomStringConvertible {
 
     // extra space help on Terminal for double wide unicode. For certain emoji.
     enum Piece: String, CaseIterable {
-        case empty =      "⏹ "
-        case number1 =    "1️⃣ "
-        case number2 =    "2️⃣ "
-        case number3 =    "3️⃣ "
-        case number4 =    "4️⃣ "
-        case number5 =    "5️⃣ "
-        case number6 =    "6️⃣ "
-        case number7 =    "7️⃣ "
-        case number8 =    "8️⃣ "
-        case bomb =       "💣 "
-        case flag =       "📍 "
-        case covered =    "❇️ "
-        case hidden =     "✳️ " // hidden bomb, mapped to covered when displaying.
-        case blank =      "  "
+        case empty =      "⏹"
+        case number1 =    "1️⃣"
+        case number2 =    "2️⃣"
+        case number3 =    "3️⃣"
+        case number4 =    "4️⃣"
+        case number5 =    "5️⃣"
+        case number6 =    "6️⃣"
+        case number7 =    "7️⃣"
+        case number8 =    "8️⃣"
+        case bomb =       "💣"
+        case flag =       "📍"
+        case covered =    "❇️"
+        case hidden =     "✳️" // hidden bomb, mapped to covered when displaying.
+        case blank =      " "
     }
 
     init(dimensions: (Int, Int), mines: Int) throws {
@@ -224,7 +224,8 @@ struct Game {
         // match up flags to bombs, if they all match then win
         let pairs = zip(solved.pieces, board.pieces)
         let matches = pairs.map { $0.0 == .hidden && $0.1 == .flag }
-        return matches.reduce(0) { $0 + ($1 ? 1 : 0) } == solved.mines
+        let win = matches.reduce(0) { $0 + ($1 ? 1 : 0) } == solved.mines
+        return win
     }
     
     func checkLose() -> Bool {
