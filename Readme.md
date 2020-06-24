@@ -1,6 +1,6 @@
 # Minesweeper
 ## Command Line 
-- Run the code by typeing 
+- Run the code by typing 
 
     swift Minesweeper.swift
 
