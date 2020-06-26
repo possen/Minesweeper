@@ -10,9 +10,10 @@ import SwiftUI
 
 @main
 struct MinesweeperSwiftUIApp: App {
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(SweeperController())
         }
     }
 }

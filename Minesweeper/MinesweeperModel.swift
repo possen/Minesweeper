@@ -122,7 +122,7 @@ class Board: CustomStringConvertible {
         }
     }
     
-    fileprivate func revealCoodinates(x: Int, y: Int) throws -> [(Int, Int)] {
+    fileprivate func reveal(x: Int, y: Int) throws -> [(Int, Int)] {
         guard checkOnBoard(x: x, y: y) else {
             throw Errors.badParameters
         }
@@ -206,7 +206,7 @@ struct Game {
     }
     
     func reveal(x: Int, y: Int) throws {
-        let coords = try solved.revealCoodinates(x: x, y: y)
+        let coords = try solved.reveal(x: x, y: y)
         coords.forEach { x, y in board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y) ?? .empty) }
         print(board.description)
     }
