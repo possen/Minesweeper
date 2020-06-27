@@ -14,7 +14,7 @@ class SweeperController: ObservableObject {
     var game: Game
     var state: State = .playing
     @Published var size = 40.0
-    @Published var difficulty = 40.0
+    @Published var mines = 40.0
     
     enum State {
         case win
@@ -36,28 +36,42 @@ class SweeperController: ObservableObject {
     }
     
     func reset() {
-        self.game = Self.newGame(size: Int(size), diffculty: Int(difficulty))
-        state = .playing
-        objectWillChange.send()
+        DispatchQueue.global().async { [self] in
+            let result = Self.newGame(size: Int(size), diffculty: Int(mines))
+            DispatchQueue.main.async { [self] in
+                objectWillChange.send()
+                self.game = result
+                state = .playing
+            }
+        }
     }
     
     func mark(x: Int, y: Int) -> Bool {
-        _ = try? game.mark(x: x, y: y)
-        let win = game.checkWin()
-        if win {
-            state = .win
+        DispatchQueue.global().async { [self] in
+            _ = try? game.mark(x: x, y: y)
+            let win = game.checkWin()
+            if win {
+                state = .win
+            }
+            DispatchQueue.main.async { [self] in
+                objectWillChange.send()
+            }
         }
-        objectWillChange.send()
-        return win
+
+        return false
     }
     
     func reveal(x: Int, y: Int) -> Bool {
-        _ = try? game.reveal(x: x, y: y)
-        let lose = game.checkLose()
-        if lose {
-            state = .lose
+        DispatchQueue.global().async { [self] in
+            _ = try? game.reveal(x: x, y: y)
+            let lose = game.checkLose()
+            if lose {
+                state = .lose
+            }
+            DispatchQueue.main.async { [self] in
+                objectWillChange.send()
+            }
         }
-        objectWillChange.send()
-        return lose
+        return false
     }
 }

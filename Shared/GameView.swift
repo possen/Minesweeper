@@ -13,7 +13,7 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
-            Color.blue
+            Color.green
             BoardView()
             switch controller.state {
             case .win:

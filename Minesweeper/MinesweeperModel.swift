@@ -208,7 +208,6 @@ struct Game {
     func reveal(x: Int, y: Int) throws {
         let coords = try solved.reveal(x: x, y: y)
         coords.forEach { x, y in board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y) ?? .empty) }
-        print(board.description)
     }
     
     func mark(x: Int, y: Int) throws {
