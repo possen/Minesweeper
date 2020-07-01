@@ -114,7 +114,7 @@ class Board: CustomStringConvertible {
         return str
     }
     
-    fileprivate func visit(each: ( Int, Int) -> Void) {
+    fileprivate func visit(each: (Int, Int) -> Void) {
         (0..<dimensions.1).forEach { y in
             (0..<dimensions.0).forEach { x in
                 each(x, y)
@@ -148,14 +148,13 @@ class Board: CustomStringConvertible {
     }
     
     fileprivate func countNeighbors(x: Int, y: Int) -> Int {
-        return [(x+1, y), (x-1, y), (x, y+1), (x, y-1), (x+1, y+1), (x-1, y+1), (x+1, y-1), (x-1, y-1)].reduce(0) {
+        [(x+1, y), (x-1, y), (x, y+1), (x, y-1), (x+1, y+1), (x-1, y+1), (x+1, y-1), (x-1, y-1)].reduce(0) {
           $0 + (piece(x: $1.0, y: $1.1) == .hidden ? 1 : 0)
         }
     }
     
     fileprivate func pieceForCount(_ val: Int) -> Piece {
-        let item = pieceMap.first { $0.offset == val }
-        return item?.element ?? .empty
+        pieceMap.first { $0.offset == val }?.element ?? .empty
     }
     
     fileprivate func floodFill(x: Int, y: Int) -> [(Int, Int)] {
