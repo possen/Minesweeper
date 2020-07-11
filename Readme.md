@@ -15,7 +15,7 @@ Help will display
 - Solve command to display full solved game. 
 - Displays using emoji. I did have some formatting issues on terminal, depending on which terminal program being used due to double wide characters. 
 
-## Bonus - Full iOS and Cataylst App
+## Full iOS and Cataylst App
 - I was having fun with this project, and decided to make a full app. Quick one
 - UI only tested on iPhone 11 Max - I believe it has formatting problems on different size devices
 - Use `tap` to reveal
@@ -23,6 +23,9 @@ Help will display
 - It is a little bit difficult to tap the small boxes on a real device but with a little practice it works pretty well. 
 - Catalyst version, the window can be sized so the boxes are presented properly. but works pretty well. 
 - Error handling does not display the best errors. 
+
+## Supports AppClips
+- Small app supports App Clips
     
 ### What was implemented
 - iOS app that runs best on iPhone 11 Max
