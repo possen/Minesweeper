@@ -93,6 +93,7 @@ class ViewController: UIViewController {
             }
         }
     }
+    
 
     private func setupGrid(rows: Int, columns: Int) {
         guard let game = game else {
