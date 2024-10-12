@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Main app
 @main
 struct MinesweeperSwiftUIApp: App {
     

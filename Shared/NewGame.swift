@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Display a view asking for user to input new board siz
 struct NewGameView: View {
     @EnvironmentObject var controller: SweeperController
     let title: String
