@@ -26,24 +26,39 @@ struct BoardBodyView: View {
     var body: some View {
         let board = controller.game.board
 
-        VStack(spacing: 0) {
+        Grid(horizontalSpacing: 0, verticalSpacing: 0) {
             ForEach(0..<board.dimensions.1, id: \.self) { y in
-                HStack(spacing: 0) {
+                GridRow {
                     ForEach(0..<board.dimensions.0, id: \.self) { x in
-                        Text(LocalizedStringKey(convert(board.piece(x: x, y: y)!).rawValue))
-                            .font(.title)
-                            .onTapGesture {
-                                let lose = controller.reveal(x: x, y: y)
-                                print("reveal: ", x, y, lose)
-                            }.onLongPressGesture {
-                                let win = controller.mark(x: x, y: y)
-                                print("mark: ", x, y, win)
-                            }.fixedSize(horizontal: true, vertical: true)
-                            .frame(width: 29, height: 29)
+                        PieceCellView(x: x, y: y)
                     }
                 }
             }
         }
+    }
+
+}
+
+struct PieceCellView: View {
+    @EnvironmentObject var controller: SweeperController
+    let x: Int
+    let y: Int
+    
+    init(x: Int, y: Int) {
+        self.x = x
+        self.y = y
+    }
+    var body: some View {
+        let board = controller.game.board
+
+        Text(LocalizedStringKey(convert(board.piece(x: x, y: y)!).rawValue))
+            .font(.title)
+            .onTapGesture {
+                controller.reveal(x: x, y: y)
+            }.onLongPressGesture {
+                controller.mark(x: x, y: y)
+            }.fixedSize(horizontal: true, vertical: true)
+            .frame(width: 29, height: 29)
     }
 
     func convert(_ piece: Board.Piece) -> Board.Piece {

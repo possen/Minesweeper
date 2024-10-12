@@ -242,8 +242,8 @@ class Board: CustomStringConvertible {
                         queue.push(coords)
                     }
                 }
-                result += [loc]
             }
+            result += [loc]
         }
         return result
     }

@@ -45,7 +45,8 @@ class SweeperController: ObservableObject {
             }
         }
     }
-    
+
+    @discardableResult
     func mark(x: Int, y: Int) -> Bool {
         DispatchQueue.global().async { [self] in
             _ = try? game.mark(x: x, y: y)
@@ -57,13 +58,13 @@ class SweeperController: ObservableObject {
                 objectWillChange.send()
             }
         }
-
         return false
     }
-    
+
+    @discardableResult
     func reveal(x: Int, y: Int) -> Bool {
         DispatchQueue.global().async { [self] in
-            _ = try? game.reveal(x: x, y: y)
+            try? game.reveal(x: x, y: y)
             let lose = game.checkLose()
             if lose {
                 state = .lose
