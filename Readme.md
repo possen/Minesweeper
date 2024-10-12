@@ -6,6 +6,8 @@
 
 Help will display
 
+<img width="294" alt="image" src="https://github.com/user-attachments/assets/7c8d9acb-9621-44cd-8b9f-f136b3123336">
+
 ### What has been implemented. 
 
 - Dual board design one keeps the solved version, and the display board. This allows reverting a move and an easy way to check game wins. 
