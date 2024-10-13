@@ -17,10 +17,7 @@ struct GameCommand {
         case badCommand
         case noGame
     }
-    
-    init() {
-    }
-    
+        
     private func help() {
         print("Enter Commands:")
         print("help - to print this help")

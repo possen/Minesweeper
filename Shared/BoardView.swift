@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-
 struct BoardView: View {
     var body: some View {
         return ScrollView([.horizontal, .vertical]) {
@@ -36,7 +35,6 @@ struct BoardBodyView: View {
             }
         }
     }
-
 }
 
 struct PieceCellView: View {
@@ -44,20 +42,18 @@ struct PieceCellView: View {
     let x: Int
     let y: Int
     
-    init(x: Int, y: Int) {
-        self.x = x
-        self.y = y
-    }
     var body: some View {
         let board = controller.game.board
 
-        Text(LocalizedStringKey(convert(board.piece(x: x, y: y)!).rawValue))
+        Text(LocalizedStringKey(convert(board.piece(x: x, y: y) ?? Board.Piece.blank).rawValue))
             .font(.title)
             .onTapGesture {
                 controller.reveal(x: x, y: y)
-            }.onLongPressGesture {
+            }
+            .onLongPressGesture {
                 controller.mark(x: x, y: y)
-            }.fixedSize(horizontal: true, vertical: true)
+            }
+            .fixedSize(horizontal: true, vertical: true)
             .frame(width: 29, height: 29)
     }
 

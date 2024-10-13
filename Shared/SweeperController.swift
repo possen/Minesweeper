@@ -13,9 +13,9 @@ import Foundation
 class SweeperController: ObservableObject {
     var game: Game
     var state: State = .playing
-    @Published var size = 40.0
-    @Published var mines = 40.0
-    
+    @Published var size: Double
+    @Published var mines: Double
+
     enum State {
         case win
         case lose
@@ -23,12 +23,16 @@ class SweeperController: ObservableObject {
     }
     
     init() {
-        game = Self.newGame(size: 40, diffculty: 40)
+        let size = 13
+        let mines = 28
+        self.size = Double(size)
+        self.mines = Double(mines)
+        game = Self.newGame(size: size, mines: mines)
     }
     
-    static func newGame(size: Int, diffculty: Int) -> Game {
+    static func newGame(size: Int, mines: Int) -> Game {
         do {
-            let board = try Board(dimensions: (size, size), mines: diffculty)
+            let board = try Board(dimensions: (size, size), mines: mines)
             return Game(board: board)
         } catch {
             fatalError()
@@ -37,7 +41,7 @@ class SweeperController: ObservableObject {
     
     func reset() {
         DispatchQueue.global().async { [self] in
-            let result = Self.newGame(size: Int(size), diffculty: Int(mines))
+            let result = Self.newGame(size: Int(size), mines: Int(mines))
             DispatchQueue.main.async { [self] in
                 objectWillChange.send()
                 self.game = result

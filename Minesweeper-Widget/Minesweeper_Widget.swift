@@ -11,33 +11,39 @@ import SwiftUI
 import Intents
 
 struct Provider: IntentTimelineProvider {
-    
-    public func snapshot(
-        for configuration: ConfigurationIntent,
-        with context: Context,
-        completion: @escaping (SimpleEntry
-    ) -> ()) {
-        let entry = SimpleEntry(date: Date(), configuration: configuration)
+    typealias Entry = SimpleEntry
+    typealias Intent = ConfigurationIntent
+
+    func getSnapshot(
+        for configuration: Intent,
+        in context: Context,
+        completion: @escaping (Entry) -> ()
+    ) {
+        let entry = Entry(date: Date(), configuration: configuration)
         completion(entry)
     }
 
-    public func timeline(
-        for configuration: ConfigurationIntent,
-        with context: Context,
+    func getTimeline(
+        for configuration: Intent,
+        in context: Context,
         completion: @escaping (Timeline<Entry>) -> ()
     ) {
-        var entries: [SimpleEntry] = []
+        var entries: [Entry] = []
 
         // Generate a timeline consisting of five entries an hour apart, starting from the current date.
         let currentDate = Date()
         for hourOffset in 0 ..< 5 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
+            let entry = Entry(date: entryDate, configuration: configuration)
             entries.append(entry)
         }
 
         let timeline = Timeline(entries: entries, policy: .atEnd)
         completion(timeline)
+    }
+
+    func placeholder(in context: Context) -> Entry {
+        Entry(date: Date(), configuration: ConfigurationIntent())
     }
 }
 
@@ -68,12 +74,11 @@ struct Minesweeper_Widget: Widget {
         IntentConfiguration(
             kind: kind,
             intent: ConfigurationIntent.self,
-            provider: Provider(),
-            placeholder: PlaceholderView()
+            provider: Provider()
         ) { entry in
             Minesweeper_WidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
+        .configurationDisplayName("Minesweeper")
+        .description("Minesweeper game")
     }
 }
