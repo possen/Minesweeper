@@ -17,13 +17,39 @@ struct NewGameView: View {
         VStack {
             Text(title).bold().font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
             Text("# of Mines \(Int(controller.mines))")
-            Slider(value: $controller.mines, in: 1...(controller.size * controller.size), step: 1)
+            Slider(
+                value: $controller.mines,
+                in: 1...(controller.size * controller.size),
+                step: 1,
+                onEditingChanged: { _ in
+                    controller.mines = (controller.mines > controller.size * controller.size)
+                        ? controller.size * controller.size
+                        : controller.mines
+                }
+            )
             Text("Size \(Int(controller.size))")
-            Slider(value: $controller.size, in: 1...100, step: 1)
-        }.padding(.all, 50).border(Color.black, width: 2).background(Color.green.opacity(0.8))
-        .onTapGesture {
-            controller.reset()
+            Slider(
+                value: $controller.size,
+                in: 2...100,
+                step: 1,
+                onEditingChanged: { _ in
+                    controller.mines = (controller.mines > controller.size * controller.size)
+                        ? controller.size * controller.size
+                        : controller.mines
+                }
+            )
+            Button("Start") {
+                controller.state = .playing
+                controller.reset()
+            }
+            .bold()
+            .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
         }
+        .padding(.horizontal, 10)
+        .frame(width: 300)
+        .padding(.vertical, 10)
+        .border(Color.black, width: 2)
+        .background(Color.green.opacity(0.8))
     }
 }
 

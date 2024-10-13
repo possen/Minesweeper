@@ -309,7 +309,7 @@ struct Game {
     func checkLose() -> Bool {
         let loss = board.pieces.filter { $0 == .bomb }.count > 0
         if loss { // show all bombs
-            board.pieces = board.pieces.map { $0 == .hidden ? .bomb : $0 } // convert hidden bombs to shown bombs
+            board.pieces = solved.pieces.map { $0 == .hidden ? .bomb : $0 }
         }
         return loss
     }

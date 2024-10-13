@@ -10,19 +10,19 @@ import SwiftUI
 
 struct GameView: View {
     @EnvironmentObject var controller: SweeperController
-    
+
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Color.green
             BoardView()
-            switch controller.state {
-            case .win:
-                NewGameView(title: "Win" )
-            case .lose:
-                NewGameView(title: "Lose" )
-            default:
-                Text("")
-            }
+                switch controller.state {
+                case .win:
+                    NewGameView(title: "Win!")
+                case .lose:
+                    NewGameView(title: "Lose!")
+                default:
+                    Text("")
+                }
         }
     }
 }
