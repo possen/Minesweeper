@@ -9,10 +9,9 @@
 import Combine
 import Foundation
 
-
 class SweeperController: ObservableObject {
-    var game: Game
-    var state: State = .playing
+    var game: Game?
+    @Published var state: State = .playing
     @Published var size: Double
     @Published var mines: Double
 
@@ -27,55 +26,58 @@ class SweeperController: ObservableObject {
         let mines = 28
         self.size = Double(size)
         self.mines = Double(mines)
-        game = Self.newGame(size: size, mines: mines)
+        Task {
+            game = await Self.newGame(size: size, mines: mines)
+        }
     }
     
-    static func newGame(size: Int, mines: Int) -> Game {
+    static func newGame(size: Int, mines: Int) async -> Game {
         do {
-            let board = try Board(dimensions: (size, size), mines: mines)
-            return Game(board: board)
+            let board = try await Board(dimensions: (size, size), mines: mines)
+            return await Game(board: board)
         } catch {
             fatalError()
         }
     }
     
-    func reset() {
-        DispatchQueue.global().async { [self] in
-            let result = Self.newGame(size: Int(size), mines: Int(mines))
-            DispatchQueue.main.async { [self] in
-                objectWillChange.send()
-                self.game = result
-                state = .playing
-            }
+    func reset() async {
+        let result = await Self.newGame(size: Int(size), mines: Int(mines))
+        self.game = result
+        Task { @MainActor in
+            state = .playing
+            objectWillChange.send()
         }
     }
 
     @discardableResult
-    func mark(x: Int, y: Int) -> Bool {
-        DispatchQueue.global().async { [self] in
-            _ = try? game.mark(x: x, y: y)
-            let win = game.checkWin()
+    func mark(x: Int, y: Int) async -> Bool {
+        guard let game else {
+            return false
+        }
+        try? await game.mark(x: x, y: y)
+        let win = await game.checkWin()
+        Task { @MainActor in
             if win {
                 state = .win
             }
-            DispatchQueue.main.async { [self] in
-                objectWillChange.send()
-            }
+            objectWillChange.send()
         }
+
         return false
     }
 
     @discardableResult
-    func reveal(x: Int, y: Int) -> Bool {
-        DispatchQueue.global().async { [self] in
-            try? game.reveal(x: x, y: y)
-            let lose = game.checkLose()
+    func reveal(x: Int, y: Int) async -> Bool {
+        guard let game else {
+            return false
+        }
+        try? await game.reveal(x: x, y: y)
+        let lose = await game.checkLose()
+        Task { @MainActor in
             if lose {
                 state = .lose
             }
-            DispatchQueue.main.async { [self] in
-                objectWillChange.send()
-            }
+            objectWillChange.send()
         }
         return false
     }

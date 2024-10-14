@@ -23,16 +23,18 @@ struct BoardBodyView: View {
     @EnvironmentObject var controller: SweeperController
 
     var body: some View {
-        let board = controller.game.board
-
-        Grid(horizontalSpacing: 0, verticalSpacing: 0) {
-            ForEach(0..<board.dimensions.1, id: \.self) { y in
-                GridRow {
-                    ForEach(0..<board.dimensions.0, id: \.self) { x in
-                        PieceCellView(x: x, y: y)
+        if let game = controller.game {
+            Grid(horizontalSpacing: 0, verticalSpacing: 0) {
+                ForEach(0..<game.board.dimensions.1, id: \.self) { y in
+                    GridRow {
+                        ForEach(0..<game.board.dimensions.0, id: \.self) { x in
+                            PieceCellView(x: x, y: y)
+                        }
                     }
                 }
             }
+        } else {
+            Text("fail")
         }
     }
 }
@@ -43,18 +45,24 @@ struct PieceCellView: View {
     let y: Int
     
     var body: some View {
-        let board = controller.game.board
-
-        Text(LocalizedStringKey(convert(board.piece(x: x, y: y) ?? Board.Piece.blank).rawValue))
-            .font(.title)
-            .onTapGesture {
-                controller.reveal(x: x, y: y)
-            }
-            .onLongPressGesture {
-                controller.mark(x: x, y: y)
-            }
-            .fixedSize(horizontal: true, vertical: true)
-            .frame(width: 29, height: 29)
+        if let game = controller.game {
+            Text(LocalizedStringKey(convert(game.board.piece(x: x, y: y) ?? Board.Piece.blank).rawValue))
+                .font(.title)
+                .onTapGesture {
+                    Task {
+                        await controller.reveal(x: x, y: y)
+                    }
+                }
+                .onLongPressGesture {
+                    Task {
+                        await controller.mark(x: x, y: y)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: true)
+                .frame(width: 29, height: 29)
+        } else {
+            Text("failure")
+        }
     }
 
     func convert(_ piece: Board.Piece) -> Board.Piece {

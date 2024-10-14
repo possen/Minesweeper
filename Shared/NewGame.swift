@@ -39,8 +39,10 @@ struct NewGameView: View {
             )
 
             Button("Start") {
-                controller.state = .playing
-                controller.reset()
+                Task {
+                    controller.state = .playing
+                    await controller.reset()
+                }
             }
             .bold()
             .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)

@@ -11,7 +11,7 @@ import Foundation
 ///
 /// representation of a board
 ///
-class Board: CustomStringConvertible {
+actor Board: @preconcurrency CustomStringConvertible {
     private let pieceMap = Array(Piece.allCases.enumerated())
     fileprivate let mines: Int
     var cheat: Bool
@@ -44,7 +44,7 @@ class Board: CustomStringConvertible {
         case blank =      " "
     }
 
-    
+
     ///initializes a board of given demensions and number of minnes
 
     ///gives a board dimensions and number of mines
@@ -53,7 +53,7 @@ class Board: CustomStringConvertible {
     ///- Parameters:
     ///- dimensions: width and height dimensions
     ///- mines: how many random mines to place
-    init(dimensions: (Int, Int), mines: Int) throws {
+    init(dimensions: (Int, Int), mines: Int) async throws {
         guard dimensions.0 > 0 && dimensions.1 > 0 else {
             throw Errors.boardSizeInvalid
         }
@@ -76,20 +76,20 @@ class Board: CustomStringConvertible {
             pieces[index] = .hidden
         }
     }
-    
+
     /// Copy a board
     /// - Parameter original: board to copy
-    private init(original: Board) {
-        self.cheat = original.cheat
+    private init(original: Board) async {
+        self.cheat = await original.cheat
         self.dimensions = original.dimensions
-        self.pieces = original.pieces
+        self.pieces = await original.pieces
         self.mines = original.mines
     }
-    
+
     /// Copy board
     /// - Returns: copy of board
-    fileprivate func copy() -> Board {
-        Board(original: self)
+    fileprivate func copy() async -> Board {
+        return await Board(original: self)
     }
 
     /// Calculate a offset in board array
@@ -100,14 +100,14 @@ class Board: CustomStringConvertible {
     fileprivate func offset(_ x: Int, _ y: Int) -> Int {
         y * dimensions.0 + x
     }
-    
+
     /// Tuple to calculate offset
     /// - Parameter tup: tuple with (x, y)
     /// - Returns: offset in array
     fileprivate func offset(_ tup: (Int, Int)) -> Int {
         offset(tup.0, tup.1)
     }
-    
+
     /// value of a piece at x, y coordinate
     /// - Parameters:
     ///   - x: x position
@@ -119,7 +119,11 @@ class Board: CustomStringConvertible {
         }
         return pieces[offset(x, y)]
     }
-    
+
+    fileprivate func setPieces(pieces: [Piece]) {
+        self.pieces = pieces
+    }
+
     /// sets value of piece
     /// - Parameters:
     ///   - x: x position
@@ -131,10 +135,11 @@ class Board: CustomStringConvertible {
         }
         pieces[offset(x, y)] = piece
     }
-    
-    /// returns a string representing a board.
+
+    /// returns a string representing a board
     var description: String {
-        let str = (0..<dimensions.1).reduce(into: "") { strout, y in
+        """
+        \((0..<dimensions.1).reduce(into: "") { strout, y in
             strout += (0..<dimensions.0).reduce(into: "") { strin, x in
                 guard let val = piece(x: x, y: y) else {
                     return
@@ -145,21 +150,10 @@ class Board: CustomStringConvertible {
                 strin += modified.rawValue
             }
             strout += "\n"
-        }
-        return str
+        })
+        """
     }
 
-    
-    /// apply a function to each piece on board
-    /// - Parameter each: call back with x and y positino
-    fileprivate func visit(each: (Int, Int) -> Void) {
-        (0..<dimensions.1).forEach { y in
-            (0..<dimensions.0).forEach { x in
-                each(x, y)
-            }
-        }
-    }
-    
     /// Show all hidden pieces
     /// - Parameters:
     ///   - x: x position
@@ -175,7 +169,7 @@ class Board: CustomStringConvertible {
         }
         return floodFill(x: x, y: y)
     }
-    
+
     /// mark a space with a flag
     /// - Parameters:
     ///   - x: x position
@@ -189,7 +183,7 @@ class Board: CustomStringConvertible {
             setPiece(x: x, y: y, piece: .flag)
         }
     }
-    
+
     /// verify a coordinate is on board
     /// - Parameters:
     ///   - x: x position
@@ -198,7 +192,7 @@ class Board: CustomStringConvertible {
     fileprivate func checkOnBoard(x: Int, y: Int) -> Bool {
         0..<dimensions.0 ~= x && 0..<dimensions.1 ~= y
     }
-    
+
     /// counts number of neighboring mines for a coordinate
     /// - Parameters:
     ///   - x: x position
@@ -209,7 +203,7 @@ class Board: CustomStringConvertible {
           $0 + (piece(x: $1.0, y: $1.1) == .hidden ? 1 : 0)
         }
     }
-    
+
     /// determines what peice to render for a count
     /// - Parameter val: 0-8 count
     /// - Returns: piece to display
@@ -217,7 +211,7 @@ class Board: CustomStringConvertible {
     fileprivate func pieceForCount(_ val: Int) -> Piece {
         pieceMap.first { $0.offset == val }?.element ?? .empty
     }
-    
+
     /// fills in board for all places there is an empty space and fills it it with empty
     /// values
     /// - Parameters:
@@ -260,56 +254,73 @@ struct Game {
     let solved: Board
     var board: Board
 
-    init(board: Board) {
-        self.solved = board.copy()
+    init(board: Board) async {
+        let solved = await board.copy()
+        self.solved = solved
         self.board = board
+
         // solved board shows all pieces and their counts and allows unmarking flag.
-        board.visit { x, y in
-            let value = solved.piece(x: x, y: y)
-            if value != .hidden {
-                solved.setPiece(x: x, y: y, piece: solved.pieceForCount(solved.countNeighbors(x: x, y: y)))
+        visit { x, y in
+            Task {
+                let value = await solved.piece(x: x, y: y)
+                if value != .hidden {
+                    await solved.setPiece(x: x, y: y, piece: solved.pieceForCount(solved.countNeighbors(x: x, y: y)))
+                }
             }
         }
     }
-    
+
+    /// apply a function to each piece on board
+    /// - Parameter each: call back with x and y positino
+    fileprivate func visit(each: (Int, Int) -> Void) {
+        (0..<board.dimensions.1).forEach { y in
+            (0..<board.dimensions.0).forEach { x in
+                each(x, y)
+            }
+        }
+    }
+
+
     /// reveal piece at x, y coordinate
     /// - Parameters:
     ///   - x: x position
     ///   - y: y position
-    func reveal(x: Int, y: Int) throws {
-        let coords = try solved.reveal(x: x, y: y)
-        coords.forEach { x, y in board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y) ?? .empty) }
+    func reveal(x: Int, y: Int) async throws {
+        let coords = try await solved.reveal(x: x, y: y)
+        for (x, y) in coords {
+            await board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y) ?? .empty)
+        }
     }
-    
+
     /// Mark a position with a flag
     /// - Parameters:
     ///   - x: x position
     ///   - y: y position
-    func mark(x: Int, y: Int) throws {
-        let piece = board.piece(x: x, y: y)
+    func mark(x: Int, y: Int) async throws {
+        let piece = await board.piece(x: x, y: y)
         if piece == .flag { // restore
-            board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y)!)
+            await board.setPiece(x: x, y: y, piece: solved.piece(x: x, y: y)!)
         } else {
-            try board.mark(x: x, y: y)
+            try await board.mark(x: x, y: y)
         }
     }
-    
+
     /// Checks if user won game
     /// - Returns: boolean true if won
-    func checkWin() -> Bool {
+    func checkWin() async -> Bool {
         // match up flags to bombs, if they all match then win
-        let pairs = zip(solved.pieces, board.pieces)
+        let pairs = await zip(solved.pieces, board.pieces)
         let matches = pairs.map { $0.0 == .hidden && $0.1 == .flag }
         let win = matches.reduce(0) { $0 + ($1 ? 1 : 0) } == solved.mines
         return win
     }
-    
+
     /// checks if user llost game and reveals all the bombs
     /// - Returns: true if lose
-    func checkLose() -> Bool {
-        let loss = board.pieces.filter { $0 == .bomb }.count > 0
+    func checkLose() async -> Bool {
+        let loss = await board.pieces.filter { $0 == .bomb }.count > 0
         if loss { // show all bombs
-            board.pieces = solved.pieces.map { $0 == .hidden ? .bomb : $0 }
+            await board.setPieces(pieces: solved.pieces.map { $0 == .hidden ? .bomb : $0 })
         }
         return loss
     }
