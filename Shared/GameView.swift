@@ -15,14 +15,14 @@ struct GameView: View {
         ZStack(alignment: .top) {
             Color.green
             BoardView()
-                switch controller.state {
-                case .win:
-                    NewGameView(title: "Win!")
-                case .lose:
-                    NewGameView(title: "Lose!")
-                default:
-                    Text("")
-                }
+            switch controller.state {
+            case .win:
+                NewGameView(title: "Win!")
+            case .lose:
+                NewGameView(title: "Lose!")
+            default:
+                Text("")
+            }
         }
     }
 }
