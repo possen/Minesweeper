@@ -9,17 +9,17 @@
 import SwiftUI
 
 struct GameView: View {
-    @EnvironmentObject var controller: SweeperController
+    @State var controller: SweeperController
 
     var body: some View {
         ZStack(alignment: .top) {
             Color.green
-            BoardView()
+            GameBoardView()
             switch controller.state {
             case .win:
-                NewGameView(title: "Win!")
+                NewGameView(controller: NewGameController(), gameController: controller, title: "Win!")
             case .lose:
-                NewGameView(title: "Lose!")
+                NewGameView(controller: NewGameController(), gameController: controller, title: "Lose!")
             default:
                 Text("")
             }
@@ -27,8 +27,7 @@ struct GameView: View {
     }
 }
 
-struct GameView_Previews: PreviewProvider {
-    static var previews: some View {
-        GameView()
-    }
+#Preview {
+    NewGameView(controller: NewGameController(), gameController: SweeperController(), title: "Win")
 }
+

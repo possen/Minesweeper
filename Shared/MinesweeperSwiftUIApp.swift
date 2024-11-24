@@ -8,13 +8,11 @@
 
 import SwiftUI
 
-/// Main app
 @main
 struct MinesweeperSwiftUIApp: App {
-    
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(SweeperController())
+            ContentView(controller: SweeperController())
         }
     }
 }

@@ -6,47 +6,51 @@
 //  Copyright © 2020 Paul Ossenbruggen. All rights reserved.
 //
 
-import Combine
 import Foundation
 
-class SweeperController: ObservableObject {
+@MainActor @Observable
+class NewGameController {
+    var size: Double // Double becasue sliders need Double
+    var mines: Double
+
+    init() {
+        self.size = Double(13)
+        self.mines = Double(28)
+    }
+}
+
+@MainActor @Observable
+class SweeperController {
     var game: Game?
-    @Published var state: State = .playing
-    @Published var size: Double
-    @Published var mines: Double
+    var state: State = .playing
+    var size = 13
+    var mines = 28
 
     enum State {
         case win
         case lose
         case playing
     }
-    
+
     init() {
-        let size = 13
-        let mines = 28
-        self.size = Double(size)
-        self.mines = Double(mines)
         Task {
-            game = await Self.newGame(size: size, mines: mines)
+            self.game = await Self.newGame(size: size, mines: mines)
         }
     }
-    
-    static func newGame(size: Int, mines: Int) async -> Game {
+
+    static func newGame(size: Int, mines: Int) async -> Game? {
         do {
-            let board = try await Board(dimensions: (size, size), mines: mines)
+            let board = try Board(dimensions: (size, size), mines: mines)
             return await Game(board: board)
         } catch {
-            fatalError()
+            return nil
         }
     }
-    
+
     func reset() async {
         let result = await Self.newGame(size: Int(size), mines: Int(mines))
         self.game = result
-        Task { @MainActor in
-            state = .playing
-            objectWillChange.send()
-        }
+        state = .playing
     }
 
     @discardableResult
@@ -56,13 +60,9 @@ class SweeperController: ObservableObject {
         }
         try? await game.mark(x: x, y: y)
         let win = await game.checkWin()
-        Task { @MainActor in
-            if win {
-                state = .win
-            }
-            objectWillChange.send()
+        if win {
+            state = .win
         }
-
         return false
     }
 
@@ -73,12 +73,16 @@ class SweeperController: ObservableObject {
         }
         try? await game.reveal(x: x, y: y)
         let lose = await game.checkLose()
-        Task { @MainActor in
-            if lose {
-                state = .lose
-            }
-            objectWillChange.send()
+        if lose {
+            state = .lose
         }
         return false
+    }
+
+    func piece(x: Int, y: Int) async -> Board.Piece? {
+        guard let game else {
+            return nil
+        }
+        return await game.piece(x: x, y: y)
     }
 }

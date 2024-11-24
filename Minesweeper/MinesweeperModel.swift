@@ -53,7 +53,7 @@ actor Board: @preconcurrency CustomStringConvertible {
     ///- Parameters:
     ///- dimensions: width and height dimensions
     ///- mines: how many random mines to place
-    init(dimensions: (Int, Int), mines: Int) async throws {
+    init(dimensions: (Int, Int), mines: Int) throws {
         guard dimensions.0 > 0 && dimensions.1 > 0 else {
             throw Errors.boardSizeInvalid
         }
@@ -68,7 +68,7 @@ actor Board: @preconcurrency CustomStringConvertible {
         self.dimensions = dimensions
         self.pieces = Array(repeating: Piece.covered, count: dimensions.0 * dimensions.1)
         var availablePositions = Array(pieces.indices) /// to ensure we don't reuse same random position.
-        (0..<mines).forEach { index in
+        for _ in 0..<mines {
             guard let index = availablePositions.randomElement() else {
                 return
             }
@@ -120,6 +120,7 @@ actor Board: @preconcurrency CustomStringConvertible {
         return pieces[offset(x, y)]
     }
 
+    /// Set whole board
     fileprivate func setPieces(pieces: [Piece]) {
         self.pieces = pieces
     }
@@ -252,7 +253,7 @@ extension Array {
 /// Manages game state, keepinng a solved representation of board and player representatioin. Solved board allows unmarking.
 struct Game {
     let solved: Board
-    var board: Board
+    let board: Board
 
     init(board: Board) async {
         let solved = await board.copy()
@@ -260,26 +261,23 @@ struct Game {
         self.board = board
 
         // solved board shows all pieces and their counts and allows unmarking flag.
-        visit { x, y in
-            Task {
-                let value = await solved.piece(x: x, y: y)
-                if value != .hidden {
-                    await solved.setPiece(x: x, y: y, piece: solved.pieceForCount(solved.countNeighbors(x: x, y: y)))
-                }
+
+        for (x, y) in allCoords() {
+            let value = await solved.piece(x: x, y: y)
+            if value != .hidden {
+                await solved.setPiece(x: x, y: y, piece: solved.pieceForCount(solved.countNeighbors(x: x, y: y)))
             }
         }
     }
 
-    /// apply a function to each piece on board
-    /// - Parameter each: call back with x and y positino
-    fileprivate func visit(each: (Int, Int) -> Void) {
-        (0..<board.dimensions.1).forEach { y in
-            (0..<board.dimensions.0).forEach { x in
-                each(x, y)
+    /// Return a list of all board coordinaates
+    fileprivate func allCoords() -> [(Int, Int)] {
+         (0..<board.dimensions.1).flatMap { y in
+            (0..<board.dimensions.1).map { x in
+                (x, y)
             }
         }
     }
-
 
     /// reveal piece at x, y coordinate
     /// - Parameters:
@@ -303,6 +301,10 @@ struct Game {
         } else {
             try await board.mark(x: x, y: y)
         }
+    }
+
+    func piece(x: Int, y: Int) async -> Board.Piece? {
+        await board.piece(x: x, y: y)
     }
 
     /// Checks if user won game

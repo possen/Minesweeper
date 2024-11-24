@@ -10,7 +10,8 @@ import SwiftUI
 
 /// Display a view asking for user to input new board siz
 struct NewGameView: View {
-    @EnvironmentObject var controller: SweeperController
+    @State var controller: NewGameController
+    @State var gameController : SweeperController
     let title: String
 
     var body: some View {
@@ -39,9 +40,9 @@ struct NewGameView: View {
             )
 
             Button("Start") {
-                Task {
-                    controller.state = .playing
-                    await controller.reset()
+                Task { [gameController] in
+                   gameController.state = .playing
+                   await gameController.reset()
                 }
             }
             .bold()
@@ -74,10 +75,8 @@ struct NewGameView: View {
     }
 }
 
-struct NewGameLose_Previews: PreviewProvider {
-    static var previews: some View {
-        NewGameView(title: "Lose")
-    }
+#Preview {
+    NewGameView(controller:NewGameController(), gameController: SweeperController(), title:  "Lose")
 }
 
 //struct NewGameWin_Previews: PreviewProvider {

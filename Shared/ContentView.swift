@@ -9,18 +9,21 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var controller: SweeperController
-    
+    @State var controller: SweeperController
+
     var body: some View {
-        ZStack {
-            Color.green.edgesIgnoringSafeArea(.all)
-            GameView()
+        NavigationStack {
+            NavigationLink("New Game") {
+                NewGameView(controller: NewGameController(), gameController: controller, title: "New")
+            }
+            ZStack {
+                Color.green.edgesIgnoringSafeArea(.all)
+                GameView(controller: controller)
+            }
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+#Preview {
+    ContentView(controller: SweeperController())
 }
